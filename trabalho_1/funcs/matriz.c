@@ -45,3 +45,12 @@ void transpose(float **mtx, float nrow, float ncol){
             mtx[i][j]=mtx_aux[j][i];
     liberaMatriz(mtx_aux, nrow);
 }
+
+void enval(void (*ptr_f)(float**, float, float), float** mtx, float nrow, float ncol){
+    double time_spent = 0.0;
+    clock_t begin = time(NULL);
+    ptr_f(mtx, nrow, ncol);
+    clock_t end = time(NULL);
+    time_spent += (end - begin);
+    printf("levou %f segundos \n", time_spent);
+}
