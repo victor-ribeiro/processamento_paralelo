@@ -54,7 +54,7 @@ void transpose_t(float** mtx, float nrow, float ncol, int tile){
             for(int i=ii; i < (tile + ii); i++)
                 for(int j=jj; j < (tile + jj); j++)
                     mtx[i][j]=mtx_aux[j][i];
-    // liberaMatriz(mtx_aux, nrow);
+    liberaMatriz(mtx_aux, nrow);
 }
 
 void enval(void (*ptr_f)(float**, float, float), float** mtx, float nrow, float ncol){
