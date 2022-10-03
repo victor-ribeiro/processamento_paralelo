@@ -2,7 +2,7 @@
 #include "funcs/matriz.h"
 
 #define N_MAX 30000
-#define MAX_TILE 10000
+#define MAX_TILE 5000
 
 int main(){
     int nrow=N_MAX, ncol=N_MAX;
