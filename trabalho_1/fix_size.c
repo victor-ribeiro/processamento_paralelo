@@ -1,20 +1,20 @@
 #include <stdio.h>
 #include "funcs/matriz.h"
 
-#define N_MAX 30000
-#define MAX_TILE 5000
+#define N_MAX 20000
 
 int main(){
     int nrow=N_MAX, ncol=N_MAX;
     printf("n, s_tile, tile\n");
-    float **mtxA;
-    mtxA = alocaMatriz(nrow, ncol);
+    float *mtxA;
+    int tiles[6] = {20000, 10000, 5000, 1000, 500, 250};
+    mtxA = alocaVetor(nrow * ncol);
     iniciaMatriz(nrow, ncol, mtxA);
-    for(int i=1000; i <= MAX_TILE; i+=1000){
-        printf("%d, ", i);
-        enval((void (*) (float**, float, float)) transpose, mtxA, nrow, ncol);
-        enval_t((void (*) (float**, float, float, int)) transpose_t, mtxA, nrow, ncol, i);
+    for(int i=0; i < 6; i++){
+        printf("%d, ", tiles[i]);
+        enval((void (*) (float*, int, int)) transpose, mtxA, nrow, ncol);
+        enval_t((void (*) (float*, int, int, int)) transpose_t, mtxA, nrow, ncol, tiles[i]);
     }
-    liberaMatriz(mtxA, nrow);
+    liberaMatriz(mtxA);
     return 0;
 }
