@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../funcs/matriz.h"
+#include "funcs/matriz.h"
 
 #define N_MAX 20000
 
