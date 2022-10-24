@@ -12,7 +12,7 @@ void iniciaMatriz(int linhas, int colunas, float *matriz){
 void copiaMatriz(float **mtxOrigem, float **mtxDestino){
     float *tmp = *mtxOrigem;
     *mtxOrigem = *mtxDestino;
-    *mtxDestino = tmp;
+    // *mtxDestino = tmp;
 }
 
 void liberaMatriz(float* matriz){
@@ -20,25 +20,43 @@ void liberaMatriz(float* matriz){
 }
 
 float* transpose(float* mtx, int nrow, int ncol, int tile){
-    const int strip = 1024;
-    const int nprime = nrow - (nrow % strip);
     float tam = nrow * ncol;
     float* mtx_aux = alocaMatriz(tam);
-    #pragma loop vectorize(enable)
     copiaMatriz(&mtx_aux, &mtx);
     for(int ii=0; ii < nrow; ii+=tile)
         for(int jj=0; jj < ncol; jj+=tile)
             for(int i=ii; i < (tile + ii); i++)
                 for(int j=jj; j < (tile + jj); j++)
-                    mtx[(i * nrow) + j]=mtx_aux[(j * ncol) + i];
+                    mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
     return mtx;
 }
 
-void enval_t(void (*ptr_f)(float*, int, int, int), float* mtx, int nrow, int ncol, int tile){
+float* transpose_stride(float* mtx, int nrow, int ncol, int tile){
+    int primeRow = nrow - (nrow % 512);
+    int primeCol = nrow - (ncol % 512);
+    float tam = nrow * ncol;
+    float* mtx_aux = alocaMatriz(tam);
+    copiaMatriz(&mtx_aux, &mtx);
+    for(int ii=0; ii < primeRow; ii+=tile){
+        for(int jj=0; jj < primeCol; jj+=tile){
+            for(int i=ii; i < (tile + ii); i++)
+                for(int j=jj; j < (tile + jj); j++){
+                    mtx[(i * primeRow) + j] = mtx_aux[(j * primeCol) + i];
+            }
+        }
+    }
+    for(int i = primeRow; i < nrow; i++)
+        for(int j = primeCol; j < ncol; j++)
+                mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
+    return mtx;
+}
+
+void enval_t(float* (*ptr_f)(float*, int, int, int), float* mtx, int nrow, int ncol, int tile){
     double time_spent = 0.0;
+    float *tmp;
     clock_t begin = time(NULL);
-    ptr_f(mtx, nrow, ncol, tile);
+    tmp = ptr_f(mtx, nrow, ncol, tile);
     clock_t end = time(NULL);
     time_spent += (end - begin);
-    printf("%f\n", time_spent);
+    printf("%f", time_spent);
 }

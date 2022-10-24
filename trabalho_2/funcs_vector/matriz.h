@@ -8,4 +8,4 @@ void iniciaMatriz(int linhas, int colunas, float *matriz);
 void copiaMatriz(float **mtxOrigem, float **mtxDestino);
 void liberaMatriz(float* matriz);
 float* transpose(float* mtx, int nrow, int ncol, int tile);
-void enval_t(void (*ptr_f)(float*, int, int, int), float* mtx, int nrow, int ncol, int tile);
+void enval_t(float* (*ptr_f)(float*, int, int, int), float* mtx, int nrow, int ncol, int tile);
