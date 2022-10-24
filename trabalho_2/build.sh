@@ -1,8 +1,13 @@
 #!/bin/bash
 
-echo 'Codigo nao vetorizado. '
-gcc-12 -O3 -ftree-vectorize -fopt-info-vec -fopt-info-missed move_out_brancher.c
-echo '\n\n'
+clang -O3 -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize stride.c -o stride.exe
 
-echo 'Codigo vetorizado. '
-gcc-12 -O3 -ftree-vectorize -fopt-info-vec -fopt-info-missed move_out_brancher_vec.c
+for i in 1 2 3 4 5 6 7 8 9 10;
+    do 
+        ./stride.exe >> stride_$i.txt;
+    done
+
+cd ..
+git add .
+git commit -m "arquivos de resultado"
+git push
