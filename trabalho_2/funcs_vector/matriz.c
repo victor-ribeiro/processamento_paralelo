@@ -32,8 +32,8 @@ float* transpose(float* mtx, int nrow, int ncol, int tile){
 }
 
 float* transpose_stride(float* mtx, int nrow, int ncol, int tile){
-    int primeRow = nrow - (nrow % 512);
-    int primeCol = nrow - (ncol % 512);
+    int primeRow = nrow - (nrow % tile/2);
+    int primeCol = nrow - (ncol % tile/2);
     float tam = nrow * ncol;
     float* mtx_aux = alocaMatriz(tam);
     copiaMatriz(&mtx_aux, &mtx);
@@ -41,7 +41,7 @@ float* transpose_stride(float* mtx, int nrow, int ncol, int tile){
         for(int jj=0; jj < primeCol; jj+=tile){
             for(int i=ii; i < (tile + ii); i++)
                 for(int j=jj; j < (tile + jj); j++){
-                    mtx[(i * primeRow) + j] = mtx_aux[(j * primeCol) + i];
+                    mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
             }
         }
     }
