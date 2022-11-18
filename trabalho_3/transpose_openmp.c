@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include "funcs_vector/matriz.h"
 
-#define N 409600
+#define N 40960
 #define TILE 4096
 
 int main(){
