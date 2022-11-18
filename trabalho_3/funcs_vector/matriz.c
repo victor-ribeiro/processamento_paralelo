@@ -1,6 +1,15 @@
+void imprimeMatrix(float *mtx, int n){
+    for(int i=0; i < n; i++){
+        for(int j=0; j < n; j++)
+            printf("%f\t", mtx[(i * n) + j]);
+        printf("\n");
+    }
+    printf("\n");
+}
+
 float* alocaMatriz(int iTam){
-    return (float*) malloc(iTam * sizeof(float));
-    // return (float*) aligned_alloc(iTam * sizeof(float), 16);
+    // return (float*) malloc(iTam * sizeof(float));
+    return aligned_alloc(64, sizeof(float) * iTam * 64);
 }
 
 void iniciaMatriz(int linhas, int colunas, float *matriz){
@@ -13,39 +22,20 @@ void iniciaMatriz(int linhas, int colunas, float *matriz){
 void copiaMatriz(float **mtxOrigem, float **mtxDestino){
     float *tmp = *mtxOrigem;
     *mtxOrigem = *mtxDestino;
-    // *mtxDestino = tmp;
+    *mtxDestino = tmp;
 }
 
 float* transpose(float* mtx, int nrow, int ncol, int tile){
     float tam = nrow * ncol;
     float* mtx_aux = alocaMatriz(tam);
-    copiaMatriz(&mtx_aux, &mtx);
-    for(int ii=0; ii < nrow; ii+=tile)
-        for(int jj=0; jj < ncol; jj+=tile)
-            for(int i=ii; i < (tile + ii); i++)
-                for(int j=jj; j < (tile + jj); j++)
-                    mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
-    return mtx;
-}
-
-float* transpose_stride(float* mtx, int nrow, int ncol, int tile){
-    int primeRow = nrow - (nrow % 16);
-    int primeCol = nrow - (ncol % 16);
-    float tam = nrow * ncol;
-    float* mtx_aux = alocaMatriz(tam);
-    copiaMatriz(&mtx_aux, &mtx);
-    for(int ii=0; ii < primeRow; ii+=tile){
-        for(int jj=0; jj < primeCol; jj+=tile){
-            for(int i=ii; i < (tile + ii); i++)
-                for(int j=jj; j < (tile + jj); j++){
-                    mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
-            }
-        }
-    }
-    for(int i = primeRow; i < nrow; i++)
-        for(int j = primeCol; j < ncol; j++)
-                mtx[(i * nrow) + j] = mtx_aux[(j * ncol) + i];
-    return mtx;
+    #pragma simd
+    for(unsigned ii=0; ii < nrow; ii+=tile)
+        for(unsigned jj=0; jj < ncol; jj+=tile)
+                for(unsigned i=ii; i < (tile + ii); i++)
+                    #pragma vector aligned
+                    for(unsigned j=jj; j < (tile + jj); j++)
+                        mtx_aux[(j * ncol) + i] = mtx[(i * nrow) + j];        
+    return mtx_aux;
 }
 
 void enval_t(float* (*ptr_f)(float*, int, int, int), float* mtx, int nrow, int ncol, int tile){

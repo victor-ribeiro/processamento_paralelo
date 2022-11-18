@@ -3,6 +3,7 @@
 #include <time.h>
 #include "matriz.c"
 
+void imprimeMatrix(float *mtx, int n);
 float* alocaMatriz(int iTam);
 void iniciaMatriz(int linhas, int colunas, float *matriz);
 void copiaMatriz(float **mtxOrigem, float **mtxDestino);
