@@ -20,10 +20,6 @@ int main(int argc, char *argv[]){
     mtx = transpose_tile(mtx, N, N, TILE);
     imprimeMatrix(mtx, N);
     
-    // transposicao com stride
-    mtx = transpose_stride(mtx, N, N, TILE);
-    imprimeMatrix(mtx, N);
-    
     // transposicao com openpm
     mtx = transpose_paralel(mtx, N, N, TILE, THREADS);
     imprimeMatrix(mtx, N);

@@ -13,15 +13,9 @@ do
     ./transpose.out $i $threads $rep $tam $tile;
 done
 
-# echo "threads fixos"
-# for i in 512 1024 2048 4096;
-# do
-#     ./transpose.out 2 $threads $rep $tam $i;
-#     ./transpose.out 3 $threads $rep $tam $i;
-# done
 
-# echo "tile fixo"
-# for i in 2 4 8 16
-# do
-#     ./transpose.out 3 $i $rep $tam $tile;
-# done
+echo "tile fixo"
+for i in 2 4 8 16
+do
+    ./transpose.out 3 $i $rep $tam $tile;
+done
