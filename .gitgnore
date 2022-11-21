@@ -1,3 +1,5 @@
-.exe
-.out
-slides
+*.exe
+*.out
+*slides
+*.report
+*.txt

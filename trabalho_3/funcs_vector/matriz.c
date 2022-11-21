@@ -42,9 +42,9 @@ float* transpose(float* mtx, int nrow, int ncol){
 float* transpose_tile(float* mtx, int nrow, int ncol, int tile){
     int tam = nrow * ncol;
     float* mtx_aux = alocaMatriz(tam);
-    #pragma omp simd
     for(unsigned ii=0; ii < nrow; ii+=tile)
         for(unsigned jj=0; jj < ncol; jj+=tile)
+            #pragma omp simd
             for(unsigned i=ii; i < (tile + ii); i++)
                 for(unsigned j=jj; j < (tile + jj); j++)
                     mtx_aux[(i * nrow) + j] = mtx[(j * ncol) + i];
@@ -56,11 +56,11 @@ float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads){
     int tam = nrow * ncol;
     float* mtx_aux = alocaMatriz(tam);
     omp_set_num_threads(threads);
-    #pragma omp parallelfor
     for(unsigned ii=0; ii < nrow; ii+=tile)
         for(unsigned jj=0; jj < ncol; jj+=tile)
-            #pragma omp simd
+            #pragma omp parallel for
             for(unsigned i=ii; i < (tile + ii); i++)
+                #pragma simd
                 for(unsigned j=jj; j < (tile + jj); j++){
                     mtx_aux[(i * nrow) + j] = mtx[(j * ncol) + i];
                 }
