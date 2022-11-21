@@ -1,6 +1,6 @@
 #/bin/bash
 
-gcc-12 -O3 -fopt-info-optimized-missed=vect_info.report -fopenmp transpose_openmp.c -o transpose.out
+gcc -O3 -fopt-info-optimized-missed=vect_info.report -fopenmp transpose_openmp.c -o transpose.out
 
 threads=2
 rep=3
