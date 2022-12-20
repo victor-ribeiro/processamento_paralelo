@@ -7,9 +7,7 @@
 
 void escreveResult(float *buffer, char *nome, unsigned n){
     FILE *fp = fopen(nome, "wb");
-    // fwrite(buffer, sizeof(buffer),n, fp);
     for(unsigned i=0; i < n; i++) fprintf(fp, "%f\n", buffer[i]);
-    // fputs((char*) buffer, fp);
     fclose(fp);
 }
 

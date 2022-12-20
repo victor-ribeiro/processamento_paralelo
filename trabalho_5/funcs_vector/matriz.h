@@ -4,6 +4,7 @@
 #include <omp.h>
 
 #include "matriz.c"
+#include "mpi.h"
 
 void liberaMatriz(float* matriz);
 void imprimeMatrix(float *mtx, int n);
@@ -14,6 +15,7 @@ float* transpose(float* mtx, int nrow, int ncol);
 float* transpose_tile(float* mtx, int nrow, int ncol, int tile);
 float* transpose_stride(float* mtx, int nrow, int ncol, int tile);
 float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads);
+float* transpose_MPI(int numtasks, float *buff, int *argc, char ***argv);
 float enval(float *mtx, int cols, int rows);
 float enval_tile(float *mtx, int cols, int rows, int tile);
 float enval_paralel(float *mtx, int cols, int rows, int tile, int threads);

@@ -12,7 +12,6 @@ void liberaMatriz(float* matriz){
 }
 
 float* alocaMatriz(int iTam){
-    // return (float*) malloc(iTam * sizeof(float));
     return aligned_alloc(16, sizeof(float) * iTam * 64);
 }
 
@@ -67,6 +66,15 @@ float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads){
     liberaMatriz(mtx);
     return mtx_aux;
 }
+
+float* transpose_MPI(int numtasks, float *buff, int *argc, char ***argv){
+    int rank;
+    MPI_init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+}
+
+
 
 float enval(float *mtx, int cols, int rows){
     clock_t begin = time(NULL);

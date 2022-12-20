@@ -23,5 +23,7 @@ int main(int argc, char *argv[]){
     // transposicao com openpm
     mtx = transpose_paralel(mtx, N, N, TILE, THREADS);
     imprimeMatrix(mtx, N);
+
+    transpose_MPI(3, mtx, &argc, &argv);
     return 0;
 }
