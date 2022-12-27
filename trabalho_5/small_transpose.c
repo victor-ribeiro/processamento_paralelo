@@ -4,53 +4,57 @@
 #include <math.h>
 #include "mpi.h"
 
+
 #include "funcs_vector/matriz.h"
 
 int main(int argc, char **argv){
     const int N = atoi(argv[1]);
     const int TILE = atoi(argv[2]);
     const int THREADS = atoi(argv[3]);
-    int rank, numtasks, tam;
 
-    float *recvbuf, *mtx = alocaMatriz(N * N), *t_mtx = alocaMatriz(N*N);
+    int rank, numtasks, n_cels, n_rows,source=0;
+    float *mtx = alocaMatriz(N * N), *t_mtx = alocaMatriz(N * N);
+    int *idx_mtx, *recvbuf, *sendbuf = (int*) malloc(sizeof(int) * n_cels);
+    MPI_Request reqs[2];
+    MPI_Status stats[2];
 
+    idx_mtx = (int*) malloc(sizeof(int) * N * N);
+    iniciaMatriz(N, N, mtx);
 
-    int n_sub_mtx, source=0;
-    MPI_Status stat;
-    MPI_Datatype indextype;
+    for(int i = 0; i < N * N; i++) idx_mtx[i] = i;
+
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    tam = ceil(( N) / (numtasks - 1));
+    n_cels = (int) (N * N) / numtasks;
+    n_rows = (int) N / numtasks;
+    
+    MPI_Scatter(idx_mtx, n_cels, MPI_INT, sendbuf, n_cels, MPI_INT, source, MPI_COMM_WORLD);
+        recvbuf = (int*) malloc(sizeof(int) * n_cels);
 
-    // recvbuf = transpose_paralel(recvbuf, tam, tam, TILE, THREADS);
-    n_sub_mtx = (int) ceil(sizeof(mtx) / tam * tam);
+    if (rank==0){
+        // imprimeMatrix(mtx, N);
 
-    if(rank == source) {
-        int *blocklengths = (int*) malloc(sizeof(int) * n_sub_mtx);
-        int *displacements = (int*) malloc(sizeof(int) * n_sub_mtx);
-        iniciaMatriz(N,N, mtx);
+        transpose_MPI(sendbuf, N, n_rows, rank, TILE, THREADS);
+        
+        for(int i = 0; i < n_cels; i++) t_mtx[i] = mtx[sendbuf[i]];
+        
+        MPI_Irecv(recvbuf, n_cels, MPI_INT, 1, 1, MPI_COMM_WORLD, &reqs[0]);
+        MPI_Wait(&reqs[0], &stats[0]);
+
+        for(int i = n_cels; i < N*N; i++) t_mtx[i] = mtx[recvbuf[i-n_cels]];
+        
         imprimeMatrix(mtx, N);
-
-        for(int i = 0; i < n_sub_mtx; i++) blocklengths[i] = tam;
-        for(int i = 0; i < n_sub_mtx; i++) {
-            displacements[i] = tam * i;
-            printf("[%d %d]\n", displacements[i], blocklengths[i]);
-        }
-
-        MPI_Type_indexed(n_sub_mtx, blocklengths, displacements, MPI_FLOAT, &indextype);
-        MPI_Type_commit(&indextype);
-        /*envio das mensagens*/
-        for(int i = 1; i < numtasks; i++) MPI_Send(mtx, tam*tam, indextype, i, 1, MPI_COMM_WORLD);
-    } 
-    else{
-        recvbuf = alocaMatriz(tam * tam);
-        MPI_Recv(recvbuf, tam*tam, MPI_FLOAT, source, 1, MPI_COMM_WORLD, &stat);
-        printf("rank= %d \n", rank);
-        // imprimeMatrix(recvbuf, tam);
+        printf("\n");
+        imprimeMatrix(t_mtx, N);
+    }else{
+        transpose_MPI(sendbuf, N, n_rows, n_rows, TILE, THREADS);
+        MPI_Isend(sendbuf, n_cels, MPI_INT, 0, 1, MPI_COMM_WORLD, &reqs[1]);
     }
 
+    // ainda falta coletar o tempo, 
     MPI_Finalize();
+    liberaMatriz(mtx);
     return 0;
 }

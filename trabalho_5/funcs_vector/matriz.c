@@ -12,7 +12,7 @@ void liberaMatriz(float* matriz){
 }
 
 float* alocaMatriz(int iTam){
-    return aligned_alloc(16, sizeof(float) * iTam * 64);
+    return (float*) malloc(sizeof(float) * iTam);
 }
 
 void iniciaMatriz(int linhas, int colunas, float *matriz){
@@ -43,12 +43,22 @@ float* transpose_tile(float* mtx, int nrow, int ncol, int tile){
     float* mtx_aux = alocaMatriz(tam);
     for(unsigned ii=0; ii < nrow; ii+=tile)
         for(unsigned jj=0; jj < ncol; jj+=tile)
-            #pragma omp simd
             for(unsigned i=ii; i < (tile + ii); i++)
                 for(unsigned j=jj; j < (tile + jj); j++)
                     mtx_aux[(i * nrow) + j] = mtx[(j * ncol) + i];
     liberaMatriz(mtx);
     return mtx_aux;
+}
+
+void transpose_MPI(int *mtx_, int ncols, int nrows, int rank, int tile, int threads){
+    omp_set_num_threads(threads);
+    for(unsigned ii=0; ii < nrows; ii+=tile)
+        for(unsigned jj=0; jj < ncols; jj+=tile)
+            #pragma omp parallel for
+            for(unsigned i=ii; i < (tile + ii); i++)
+                #pragma simd
+                for(unsigned j=jj; j < (tile + jj); j++)
+                    mtx_[i * ncols + j] = j * ncols + i + rank;
 }
 
 float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads){
