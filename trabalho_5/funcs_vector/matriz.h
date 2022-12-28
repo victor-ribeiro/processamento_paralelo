@@ -14,7 +14,7 @@ float* transpose(float* mtx, int nrow, int ncol);
 float* transpose_tile(float* mtx, int nrow, int ncol, int tile);
 float* transpose_stride(float* mtx, int nrow, int ncol, int tile);
 void transpose_MPI(int *mtx_, int ncols, int nrows, int rank, int tile);
-float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads);
+float* transpose_paralel(float* mtx, int nrow, int ncol, int tile, int threads, int threads);
 float enval(float *mtx, int cols, int rows);
 float enval_tile(float *mtx, int cols, int rows, int tile);
 float enval_paralel(float *mtx, int cols, int rows, int tile, int threads);
