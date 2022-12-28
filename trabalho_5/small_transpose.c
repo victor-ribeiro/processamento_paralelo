@@ -31,23 +31,22 @@ int main(int argc, char **argv){
     n_rows = (int) N / numtasks;
     
     MPI_Scatter(idx_mtx, n_cels, MPI_INT, sendbuf, n_cels, MPI_INT, source, MPI_COMM_WORLD);
-        recvbuf = (int*) malloc(sizeof(int) * n_cels);
+    recvbuf = (int*) malloc(sizeof(int) * n_cels);
 
     if (rank==0){
-        // imprimeMatrix(mtx, N);
-
+        double start = MPI_Wtime();
         transpose_MPI(sendbuf, N, n_rows, rank, TILE, THREADS);
         
         for(int i = 0; i < n_cels; i++) t_mtx[i] = mtx[sendbuf[i]];
         
+
         MPI_Irecv(recvbuf, n_cels, MPI_INT, 1, 1, MPI_COMM_WORLD, &reqs[0]);
         MPI_Wait(&reqs[0], &stats[0]);
-
         for(int i = n_cels; i < N*N; i++) t_mtx[i] = mtx[recvbuf[i-n_cels]];
         
-        imprimeMatrix(mtx, N);
-        printf("\n");
-        imprimeMatrix(t_mtx, N);
+        double end = MPI_Wtime();
+        double time = end - start;
+        printf("time: %f\n", time);
     }else{
         transpose_MPI(sendbuf, N, n_rows, n_rows, TILE, THREADS);
         MPI_Isend(sendbuf, n_cels, MPI_INT, 0, 1, MPI_COMM_WORLD, &reqs[1]);

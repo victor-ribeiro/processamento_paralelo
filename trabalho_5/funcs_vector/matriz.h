@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <omp.h>
+// #include <omp.h>
 
 #include "matriz.c"
 
