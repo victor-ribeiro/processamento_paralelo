@@ -16,7 +16,7 @@ float* alocaMatriz(int iTam){
 }
 
 void iniciaMatriz(int linhas, int colunas, float *matriz){
-    essa funcao nao consegue vetoriza
+    // essa funcao nao consegue vetoriza
     int n = linhas * colunas;
     for(int i = 0; i < n; i++)
         matriz[i] = ((float) rand() / (float) RAND_MAX);

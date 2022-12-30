@@ -4,7 +4,6 @@
 #include <math.h>
 #include "mpi.h"
 
-
 #include "funcs_vector/matriz.h"
 
 int main(int argc, char **argv){
@@ -14,7 +13,7 @@ int main(int argc, char **argv){
 
     int rank, numtasks, n_cels, n_rows,source=0;
     float *mtx = alocaMatriz(N * N), *t_mtx = alocaMatriz(N * N);
-    int *idx_mtx, *recvbuf, *sendbuf = (int*) malloc(sizeof(int) * n_cels);
+    int *idx_mtx, *recvbuf, *sendbuf;
     MPI_Request reqs[2];
     MPI_Status stats[2];
 
@@ -29,6 +28,7 @@ int main(int argc, char **argv){
 
     n_cels = (int) (N * N) / numtasks;
     n_rows = (int) N / numtasks;
+    sendbuf = (int*) malloc(sizeof(int) * n_cels);
     
     MPI_Scatter(idx_mtx, n_cels, MPI_INT, sendbuf, n_cels, MPI_INT, source, MPI_COMM_WORLD);
     recvbuf = (int*) malloc(sizeof(int) * n_cels);
@@ -52,7 +52,6 @@ int main(int argc, char **argv){
         MPI_Isend(sendbuf, n_cels, MPI_INT, 0, 1, MPI_COMM_WORLD, &reqs[1]);
     }
 
-    // ainda falta coletar o tempo, 
     MPI_Finalize();
     liberaMatriz(mtx);
     return 0;
